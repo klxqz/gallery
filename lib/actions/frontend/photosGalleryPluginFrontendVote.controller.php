@@ -1,0 +1,4 @@
+<?php
+
+class photosGalleryPluginFrontendVoteController extends photosGalleryPluginVoteController
+{}
