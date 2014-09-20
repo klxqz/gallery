@@ -2,19 +2,19 @@ $(function() {
     var container = $('#content');
     
     var udpateCounterer = function(values) {
-        $('#sidebar-publicgallery-plugin-declined').find('.count').text(values.declined || 0);
-        $('#sidebar-publicgallery-plugin-awaiting').find('.count').text(values.awaiting || 0);
+        $('#sidebar-gallery-plugin-declined').find('.count').text(values.declined || 0);
+        $('#sidebar-gallery-plugin-awaiting').find('.count').text(values.awaiting || 0);
     };
     
-    container.off('click.publicgallery', 'a.moderation').
-            on('click.publicgallery', 'a.moderation', function() {
+    container.off('click.gallery', 'a.moderation').
+            on('click.gallery', 'a.moderation', function() {
                 var self = $(this);
                 var action = self.data('action');
                 if (action === 'approve' || action === 'decline') {
                     var count = $.photos.photo_stream_cache.length() - 1;
                     var total_count = $.photos.total_count - 1;
                     var photo_id = self.closest('li').data('photo-id');
-                    $.post('?plugin=publicgallery&module=backend&action=moderation', {
+                    $.post('?plugin=gallery&module=backend&action=moderation', {
                         id: photo_id,
                         moderation: action,
                         count: count,
@@ -72,7 +72,7 @@ $(function() {
             updateViewPhotoMenu.apply(this, arguments);
             $.photos.hooks_manager.bind('afterLoadPhoto', function(photo) {
                 var toolbar = $('#p-toolbar');
-                if (photo.source === "publicgallery") {
+                if (photo.source === "gallery") {
                     
                     var renderModerationMenu = function(photo) {
                         toolbar.find('.moderation').show();
@@ -85,13 +85,13 @@ $(function() {
                     
                     renderModerationMenu(photo);
                     
-                    toolbar.find('.moderation a').unbind('click.publicgallery').
-                            one('click.publicgallery', function() {
+                    toolbar.find('.moderation a').unbind('click.gallery').
+                            one('click.gallery', function() {
                                 var self = $(this);
                                 var action = self.closest('li').data('action');
                                 var photo = $.photos.photo_stream_cache.getCurrent();
                                 if (action === 'approve' || action === 'decline') {
-                                    $.post('?plugin=publicgallery&module=backend&action=moderation', {
+                                    $.post('?plugin=gallery&module=backend&action=moderation', {
                                         id: photo.id,
                                         moderation: action
                                     }, function(r) {
@@ -119,7 +119,7 @@ $(function() {
     var onLoadPhotoList = $.photos.onLoadPhotoList;
     $.photos.onLoadPhotoList = function() {
         if ($.photos.hash === '/search/moderation=0') {
-            var counter = $('#sidebar-publicgallery-plugin-awaiting').find('.count');
+            var counter = $('#sidebar-gallery-plugin-awaiting').find('.count');
             counter.text($.photos.total_count);
             if ($.photos.total_count) {
                 counter.addClass('indicator');
@@ -128,7 +128,7 @@ $(function() {
             }
         }
         if ($.photos.hash === '/search/moderation=-1') {
-            $('#sidebar-publicgallery-plugin-declined').find('.count').text($.photos.total_count);
+            $('#sidebar-gallery-plugin-declined').find('.count').text($.photos.total_count);
         }
         onLoadPhotoList.apply(this, arguments);
     };
@@ -188,10 +188,10 @@ $(function() {
             alwaysUpdate: true
         });
         $.photos.updatePhotoRate(edit_status);
-        //$.photos.publicgalleryInitYourRate();
+        //$.photos.galleryInitYourRate();
     };
     
-    $.photos.publicgalleryInitYourRate = function() {
+    $.photos.galleryInitYourRate = function() {
         $('#your-rate').rateWidget({
             onUpdate: function(){},
             hold: function() {
@@ -215,7 +215,7 @@ $(function() {
                 
         $('#photo-rate-votes-count').click(function() {
             $('<div id="photo-rates-distribution"></div>').waDialog({
-                url: '?plugin=publicgallery&module=backend&action=ratesDistribution&photo_id=' + $.photos.getPhotoId(),
+                url: '?plugin=gallery&module=backend&action=ratesDistribution&photo_id=' + $.photos.getPhotoId(),
                 className: 'width600px height500px'
             });
         });
@@ -243,7 +243,7 @@ $(function() {
                 photo_id.push(id);
                 one_photo = true;
             }
-            $.post('?plugin=publicgallery&module=vote', {
+            $.post('?plugin=gallery&module=vote', {
                 photo_id: photo_id,
                 rate: value
             }, function(r) {

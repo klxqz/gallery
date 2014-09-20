@@ -22,7 +22,7 @@ class photosGalleryPluginFrontendLoadListAction extends waViewAction
 
         $real_count = $count;
         if ($photo) {
-            $c = new photosCollection('publicgallery/myphotos');
+            $c = new photosCollection('gallery/myphotos');
             $offset = $c->getPhotoOffset($photo);
 
             if ($direction > 0) {

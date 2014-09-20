@@ -8,6 +8,7 @@ return array(
     'vendor' => 'webasyst',
     'rights' => false,
     'frontend' => true,
+    'photos_settings' => true,
     'handlers' => array(
         'backend_assets'  => 'backendAssets',
         'backend_sidebar' => 'backendSidebar',

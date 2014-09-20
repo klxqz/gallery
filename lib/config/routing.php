@@ -7,6 +7,9 @@ return array(
         'photo/myphotos/<url:[^\s]+>' => 'frontend/photo',
         'myphotos/' => 'frontend/myphotos',
         'myphotos/vote' => 'frontend/vote',
+        'myphotos/rename/' => 'frontend/rename',
+        'myphotos/add-album/' => 'frontend/addAlbum',
+        'myphotos/savealbum/' => 'frontend/saveAlbum',
     ),
     1 => array(
         'upload/imageUpload/' => 'frontend/imageUpload',
@@ -15,5 +18,9 @@ return array(
         'myphotos/<url:[^\s]+>' => 'frontend/photo',
         'myphotos/' => 'frontend/myphotos',
         'myphotos/vote' => 'frontend/vote',
+        'myphotos/rename/' => 'frontend/rename',
+        'myphotos/add-album/' => 'frontend/addAlbum',
+        'myphotos/savealbum/' => 'frontend/saveAlbum',
+        
     )
 );

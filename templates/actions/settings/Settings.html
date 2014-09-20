@@ -1,0 +1,138 @@
+<form id="plugin-gallery-form" method="post" enctype="multipart/form-data" action="?module=plugins&id=gallery&action=save">
+    <div class="field">
+        <div class="name">
+            Статус плагина
+        </div>
+        <div class="value">
+            <select name="photos_gallery[status]">
+                <option {if $settings.status == '1'}selected="selected"{/if} value="1">Включен</option>
+                <option {if $settings.status == '0'}selected="selected"{/if} value="0">Выключен</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="name">
+            [`Assign tags on upload`]
+        </div>
+        <div class="value">
+            <input type="text" name="photos_gallery[assign_tag]" value="{$settings.assign_tag|escape}" /><br/>
+            <span class="hint">[`Automatically assign listed tags for all photos uploaded in the frontend`]</span>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="name">
+            [`Moderation`]
+        </div>
+        <div class="value">
+            <input type="radio" {if $settings.need_moderation == '1'}checked="checked"{/if} name="photos_gallery[need_moderation]" value="1" /> - [`Yes`]
+            <input type="radio" {if $settings.need_moderation == '0'}checked="checked"{/if} name="photos_gallery[need_moderation]" value="0" /> - [`No`]<br/>
+            <span class="hint">[`Define if photos uploaded in the frontend needs to be moderated in the backend or not. In case moderation is disabled, all photos will automatically appear in the frontend after upload`]</span>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="name">
+            [`Self photo voting`]
+        </div>
+        <div class="value">
+            <input type="hidden" name="photos_gallery[self_vote]" value="0" />
+            <input type="checkbox" {if $settings.self_vote == '1'}checked="checked"{/if} name="photos_gallery[self_vote]" value="1" /><br/>
+            <span class="hint">[`Author can vote for self uploaded photos`]</span>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            [`Minimal photo size (px)`]
+        </div>
+        <div class="value">
+            <input type="text" name="photos_gallery[min_size]" value="{$settings.min_size|escape}" /><br/>
+            <span class="hint">[`Limits the minimum width and height for photos uploaded in the frontend (in pixels)`]</span>
+        </div>
+    </div>
+    <div class="field">
+        <div class="name">
+            [`Maximum photo size (px)`]
+        </div>
+        <div class="value">
+            <input type="text" name="photos_gallery[max_size]" value="{$settings.max_size|escape}" /><br/>
+            <span class="hint">[`Limits the maximum width and height for photos uploaded in the frontend (in pixels)`]</span>
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="name">
+            Разрешенные альбомы для загрузки
+        </div>
+        <div class="value">
+            <div>
+                <input type="checkbox" {if in_array(0, $settings.albums)}checked="checked"{/if} name="photos_gallery[albums][]" value="0"/> - фотопоток
+            </div>
+            {foreach $albums as $album}
+                <div>
+                    <input type="checkbox" {if in_array($album.id, $settings.albums)}checked="checked"{/if} name="photos_gallery[albums][]" value="{$album.id}"/> - {$album.name}
+                </div>
+            {/foreach}
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="name">
+            Разрешенные альбомы для создание под-альбомов
+        </div>
+        <div class="value">
+            <div>
+                <input type="checkbox" {if in_array(0, $settings.subalbums)}checked="checked"{/if} name="photos_gallery[subalbums][]" value="0"/> - фотопоток
+            </div>
+            {foreach $albums as $album}
+                <div>
+                    <input type="checkbox" {if in_array($album.id, $settings.subalbums)}checked="checked"{/if} name="photos_gallery[subalbums][]" value="{$album.id}"/> - {$album.name}
+                </div>
+            {/foreach}
+        </div>
+    </div>
+
+
+
+
+    <div class="field">
+        <div class="value submit">
+            <input type="submit" value="Сохранить" class="button green">
+            <span style="display:none" id="plugins-settings-form-status">
+            </span>
+        </div>
+    </div>
+
+</form>
+<div class="clear-left"></div>
+
+<script>
+    $(function() {
+        $('#plugin-gallery-form').submit(function() {
+            var form = $(this);
+            $.ajax({
+                url: form.attr('action'),
+                data: form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status == 'ok') {
+                        $('#plugins-settings-form-status').html('<i class="icon16 yes" style="vertical-align:middle"></i> Сохранено').show();
+                    } else {
+                        $('#plugins-settings-form-status').html('<i class="icon16 no" style="vertical-align:middle"></i> Ошибка').show();
+                    }
+                    setTimeout(function() {
+                        $('#plugins-settings-form-status').hide();
+                    }, 3000);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    //TODO
+                }
+            });
+            return false;
+        });
+    });
+
+</script>
+

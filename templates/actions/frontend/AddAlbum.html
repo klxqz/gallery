@@ -1,0 +1,52 @@
+<h1>Новый альбом</h1>
+
+<form id="add-album" action="{$wa_app_url}myphotos/savealbum/" method="post">
+    <table>
+
+        <tr>
+            <td>Название</td>
+            <td>
+                <input type="text" name="album[name]" value="" />
+            </td>
+        </tr>
+        <tr>
+            <td>Описание</td>
+            <td>
+                <textarea cols="40" rows="10" name="album[description]"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>Родитель</td>
+            <td>
+                <select name="album[parent_id]">
+                    {foreach $subalbums as $album}
+                        <option value="{$album.id}">{$album.name}</option>
+                    {/foreach}
+                </select>
+            </td>
+        </tr>
+    </table>
+    <input type="submit" value="Сохранить">
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('#add-album').submit(function() {
+            var f = $(this);
+            $.ajax({
+                url: f.attr('action'),
+                data: f.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(response) {
+                    $.fancybox.close();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    //TODO
+                }
+            });
+            return false;
+        });
+
+    });
+</script>

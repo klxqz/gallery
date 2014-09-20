@@ -1,27 +1,54 @@
+<style>
+    #photo-list li .image{
+        position: relative;
+    }
+    .gallery-edit{
+        background: #EEFFFF;
+    }
+    .gallery-delete{
+        top: 10px;
+        right: 30px;
+        position: absolute;
+        display: block;
+        width: 16px;
+        height: 16px;
+        background: url("{$wa_app_static_url}plugins/gallery/img/red-minus-md.png");
+    }
+</style>
 <ul class="view-thumbs" id="photo-list">
-{foreach $photos as $photo}
-    <li class="{if $photo.stack_count > 0}stacked{/if} 
-        {if $photo.moderation == -1}p-declined{else if $photo.moderation == 0}p-awaiting-moderation{/if}"
-             itemscope itemtype ="http://schema.org/Photograph">
-        <div class="image">
-            <a href="{$photo.frontend_link}">
-                <div class="corner top left">
-                    {* @event prepare_photos_frontend.top_left.%plugin_id% *}
-                    {foreach $photo.hooks.top_left as $plugin => $output}{$output}{/foreach}
-                </div>
-                <div class="corner top right">
-                    {* @event prepare_photos_frontend.top_right.%plugin_id% *}
-                    {foreach $photo.hooks.top_right as $plugin => $output}{$output}{/foreach}
-                    {if $photo.stack_count > 0}<span class="indicator">{$photo.stack_count}</span>{/if}
-                </div>
-                {$wa->photos->getImgHtml($photo, '200x0', ['class'=>'shadowed','itemprop' => 'image'])}
-            </a>
-        </div>
-        <h5 itemprop="name">{$photo.name}</h5>
-        {* @event prepare_photos_frontend.name.%plugin_id% *}
+    {foreach $photos as $photo}
+        <li class="{if $photo.stack_count > 0}stacked{/if} 
+            {if $photo.moderation == -1}p-declined{else if $photo.moderation == 0}p-awaiting-moderation{/if}"
+            itemscope itemtype ="http://schema.org/Photograph">
+            <div class="image">
+                <a class="gallery-delete" data-id="{$photo.id}" href="#"></a>
+                <a href="{$photo.frontend_link}">
+                    <div class="corner top left">
+                        {* @event prepare_photos_frontend.top_left.%plugin_id% *}
+                        {foreach $photo.hooks.top_left as $plugin => $output}
+                            {$output}
+                        {/foreach}
+                    </div>
+                    <div class="corner top right">
+                        {* @event prepare_photos_frontend.top_right.%plugin_id% *}
+                        {foreach $photo.hooks.top_right as $plugin => $output}
+                            {$output}
+                        {/foreach}
+                        {if $photo.stack_count > 0}
+                            <span class="indicator">{$photo.stack_count}</span>
+                        {/if}
+                    </div>
+                    {$wa->photos->getImgHtml($photo, '200x0', ['class'=>'shadowed','itemprop' => 'image'])}
+                </a>
+            </div>
+
+            <h5 itemprop="name" class="gallery-edit" data-id="{$photo.id}" data-type="name">{$photo.name}</h5>
+            {* @event prepare_photos_frontend.name.%plugin_id% *}
         {foreach $photo.hooks.name as $plugin => $output}{$output}{/foreach}
         {if $photo.description}
-            <p itemprop="description">{$photo.description}</p>
+            <p class="gallery-edit" data-id="{$photo.id}" data-type="description" itemprop="description">{$photo.description}</p>
+        {else}
+            <p class="gallery-edit" data-id="{$photo.id}" data-type="description" itemprop="description">&nbsp;</p>
         {/if}
         {if $photo.moderation == -1}
             <p>[`Photo has been declined by the administrator`]</p>
@@ -29,8 +56,8 @@
             <p>[`Pending moderation`]</p>
         {/if}
         {* @event prepare_photos_frontend.thumb.%plugin_id% *}
-        {foreach $photo.hooks.thumb as $plugin => $output}{$output}{/foreach}
-    </li>
+    {foreach $photo.hooks.thumb as $plugin => $output}{$output}{/foreach}
+</li>
 {/foreach}
 </ul>
 
@@ -43,30 +70,83 @@
         {_w('%d photo', '%d photos', $total_photos_count)}
     {/if}
     <span class="lazyloading-progress" style="display:none">
-       <i class="icon16 loading"></i>
-       [`Loading`] {_w('%d photo','%d photos',min($photos_per_page, 9999))}...
+        <i class="icon16 loading"></i>
+        [`Loading`] {_w('%d photo','%d photos',min($photos_per_page, 9999))}...
     </span>
 </div>
-    
+
 {* switch on/off lazy loading *}
 {if !$lazy_load && !$wa->globals('disable_pageless')}
     <script type="text/javascript">
-    $(function() {
-        $.photos.setLazyLoad({
-            auto: true,  // auto load next pages(true|false) (if omitted than considered as true)
-            total_count: {$total_photos_count}
+        $(function() {
+            $.photos.setLazyLoad({
+                auto: true, // auto load next pages(true|false) (if omitted than considered as true)
+                total_count: {$total_photos_count}
+            });
+            $('#photo-list').on('click', '.gallery-edit', function() {
+                if (!$(this).find('input,textarea').length) {
+                    var input = $('<input value="' + $(this).text() + '" />');
+                    if ($(this).data('type') == 'description') {
+                        input = $('<textarea>' + $(this).text() + '</textarea>');
+                    }
+
+                    $(this).html(input);
+                    $(this).find('input,textarea').focus();
+                }
+            });
+            $('#photo-list').on('blur', '.gallery-edit input,.gallery-edit textarea', function() {
+                $.ajax({
+                    url: '{$wa_app_url}myphotos/rename/',
+                    data: {
+                        val: $(this).val(),
+                        type: $(this).parent().data('type'),
+                        id: $(this).parent().data('id')
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        //TODO
+                    }
+                });
+
+                $(this).parent().html($(this).val());
+            });
+            $('#photo-list').on('click', '.gallery-delete', function() {
+                var self = $(this);
+                $.ajax({
+                    url: '{$wa_app_url}myphotos/rename/',
+                    data: {
+                        type: 'delete',
+                        id: $(this).data('id')
+                    },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status == 'ok') {
+                            self.closest('li').remove();
+                        }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        //TODO
+                    }
+                });
+
+                return false;
+            });
+
         });
-    });
     </script>
 {/if}
 
 {* and paging in case JS is disabled… *}
 {if $pages_count > 1}
-<div class="block lazyloading-paging">
-    <ul class="menu-h">
-    {for $p=1 to $pages_count}
-        <li{if $p == $page} class="selected"{/if}><a href="?page={$p}">{$p}</a></li>
-    {/for}
-    </ul>
-</div>
+    <div class="block lazyloading-paging">
+        <ul class="menu-h">
+            {for $p=1 to $pages_count}
+                <li{if $p == $page} class="selected"{/if}><a href="?page={$p}">{$p}</a></li>
+                {/for}
+        </ul>
+    </div>
 {/if}

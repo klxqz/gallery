@@ -9,7 +9,7 @@ class photosGalleryPluginVoteController extends waJsonController
             return;
         }
         
-        $plugin = wa()->getPlugin('publicgallery');
+        $plugin = wa()->getPlugin('gallery');
         if (wa()->getEnv() == 'frontend' && !$plugin->getSettings('self_vote')) {
             $this->errors[] = _wp("You may not vote for your own photos");
             return;

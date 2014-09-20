@@ -11,7 +11,7 @@ class photosGalleryPluginFrontendLoadPhotoController extends waJsonController
     public function execute()
     {
         $url = waRequest::param('url');
-        $this->hash = 'publicgallery/myphotos';
+        $this->hash = 'gallery/myphotos';
         if (!$url) {
             throw new waException(_w('Page not found', 404));
         }

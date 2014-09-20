@@ -36,7 +36,7 @@ class photosGalleryPluginFrontendPhotoAction extends photosFrontendViewAction
         if (!$url) {
             throw new waException(_w('Page not found', 404));
         }
-        $this->hash = 'publicgallery/myphotos';
+        $this->hash = 'gallery/myphotos';
         $this->photo_model = new photosPhotoModel();
         $this->photo = $this->photo_model->getByField('url', $url);
         if (!$this->photo) {

@@ -1,6 +1,6 @@
 $(function() {
     
-    $.photos.publicgalleryInitRateWidget = function() {
+    $.photos.galleryInitRateWidget = function() {
 
         var url = $('#your-rate').parent().data('vote-url');
         var update = function(rate) {
@@ -63,6 +63,6 @@ $(function() {
         }
     };
     
-    $.photos.publicgalleryInitRateWidget();
+    $.photos.galleryInitRateWidget();
     
 });
